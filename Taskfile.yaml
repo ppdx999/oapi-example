@@ -8,6 +8,10 @@ tasks:
       - oapi-codegen -generate "types" -package oapi ./oapi.yaml > ./server/oapi/types.go
       - cd ./typescript-client; npm run gen
 
+  prism:
+    cmds:
+      - docker run --init --rm -v $(pwd):/tmp -p 4010:4010 stoplight/prism:4 mock -h 0.0.0.0 "/tmp/oapi.yaml"
+
   ok:
     cmds:
       - redocly lint oapi.yaml
