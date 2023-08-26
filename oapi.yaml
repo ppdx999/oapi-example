@@ -1,0 +1,256 @@
+openapi: 3.0.3
+info:
+  title: Todo
+  description: Todo
+  version: 1.0.0
+  license:
+    name: MIT
+    url: https://opensource.org/license/mit/
+servers:
+  - url: '{origin}/api/v1'
+    variables:
+      origin:
+        default: http://localhost:9995
+        description: Server Origin
+security:
+  - basicAuth: []
+paths:
+  /todos:
+    get:
+      tags:
+        - Todo
+      summary: Get Todo List
+      operationId: getTodoList
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Todo'
+        '400':
+          description: failed
+    post:
+      tags:
+        - Todo
+      summary: Craete Todo
+      operationId: createTodo
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                due_date:
+                  type: string
+                  format: date
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '400':
+          description: failed
+  /todos/{todo_id}:
+    get:
+      tags:
+        - Todo
+      summary: Get Todo
+      operationId: getTodo
+      parameters:
+        - $ref: '#/components/parameters/todo_id'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '400':
+          description: failed
+
+    put:
+      tags:
+        - Todo
+      summary: Update Todo
+      operationId: updateTodo
+      parameters:
+        - $ref: '#/components/parameters/todo_id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                due_date:
+                  type: string
+                  format: date
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Todo'
+        '400':
+          description: failed
+
+  /users:
+    get:
+      tags:
+        - User
+      summary: Get User List
+      operationId: getUserList
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '400':
+          description: failed
+    post:
+      tags:
+        - User
+      summary: Create User
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: failed
+  /users/{user_id}:
+    get:
+      tags:
+        - User
+      summary: Get User
+      operationId: getUser
+      parameters:
+        - $ref: '#/components/parameters/user_id'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: failed
+
+    put:
+      tags:
+        - User
+      summary: Update User
+      operationId: updateUser
+      parameters:
+        - $ref: '#/components/parameters/user_id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '400':
+          description: failed
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  parameters:
+    todo_id:
+      name: todo_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    user_id:
+      name: user_id
+      in: path
+      required: true
+      schema:
+        type: integer
+  schemas:
+    Todo:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        due_date:
+          type: string
+          format: date
+        created_by:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        todos:
+          $ref: '#/components/schemas/Todo'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
