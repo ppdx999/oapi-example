@@ -5,7 +5,7 @@ const Todo = z
   .object({
     id: z.number().int(),
     title: z.string(),
-    description: z.string(),
+    description: z.string().optional(),
     due_date: z.string().optional(),
     created_by: z.number().int().optional(),
     created_at: z.string().datetime({ offset: true }),

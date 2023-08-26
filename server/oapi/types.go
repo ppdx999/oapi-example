@@ -9,6 +9,10 @@ import (
 	openapi_types "github.com/deepmap/oapi-codegen/pkg/types"
 )
 
+const (
+	BasicAuthScopes = "basicAuth.Scopes"
+)
+
 // Defines values for UserRole.
 const (
 	Editor UserRole = "editor"

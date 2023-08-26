@@ -6,6 +6,7 @@ tasks:
       - openapi-generator-cli generate -i oapi.yaml -g haskell-http-client -o client
       - oapi-codegen -generate "server" -package oapi ./oapi.yaml > ./server/oapi/server.go
       - oapi-codegen -generate "types" -package oapi ./oapi.yaml > ./server/oapi/types.go
+      - cd ./typescript-client; npm run gen
 
   ok:
     cmds:

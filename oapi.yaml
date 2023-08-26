@@ -12,8 +12,8 @@ servers:
       origin:
         default: http://localhost:9995
         description: Server Origin
-security: []
-#   - basicAuth: []
+security:
+  - basicAuth: []
 paths:
   /todos:
     get:
@@ -223,10 +223,10 @@ paths:
         '400':
           description: failed
 components:
-  # securitySchemes:
-  #   basicAuth:
-  #     type: http
-  #     scheme: basic
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
   parameters:
     todo_id:
       name: todo_id
