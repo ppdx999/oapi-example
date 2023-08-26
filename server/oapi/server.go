@@ -19,6 +19,9 @@ type ServerInterface interface {
 	// Craete Todo
 	// (POST /todos)
 	CreateTodo(ctx echo.Context) error
+	// Delete Todo
+	// (DELETE /todos/{todo_id})
+	DeleteTodo(ctx echo.Context, todoId TodoId) error
 	// Get Todo
 	// (GET /todos/{todo_id})
 	GetTodo(ctx echo.Context, todoId TodoId) error
@@ -31,6 +34,9 @@ type ServerInterface interface {
 	// Create User
 	// (POST /users)
 	CreateUser(ctx echo.Context) error
+	// Delete User
+	// (DELETE /users/{user_id})
+	DeleteUser(ctx echo.Context, userId UserId) error
 	// Get User
 	// (GET /users/{user_id})
 	GetUser(ctx echo.Context, userId UserId) error
@@ -48,8 +54,6 @@ type ServerInterfaceWrapper struct {
 func (w *ServerInterfaceWrapper) GetTodoList(ctx echo.Context) error {
 	var err error
 
-	ctx.Set(BasicAuthScopes, []string{})
-
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.GetTodoList(ctx)
 	return err
@@ -59,10 +63,24 @@ func (w *ServerInterfaceWrapper) GetTodoList(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) CreateTodo(ctx echo.Context) error {
 	var err error
 
-	ctx.Set(BasicAuthScopes, []string{})
-
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.CreateTodo(ctx)
+	return err
+}
+
+// DeleteTodo converts echo context to params.
+func (w *ServerInterfaceWrapper) DeleteTodo(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "todo_id" -------------
+	var todoId TodoId
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "todo_id", runtime.ParamLocationPath, ctx.Param("todo_id"), &todoId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter todo_id: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.DeleteTodo(ctx, todoId)
 	return err
 }
 
@@ -76,8 +94,6 @@ func (w *ServerInterfaceWrapper) GetTodo(ctx echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter todo_id: %s", err))
 	}
-
-	ctx.Set(BasicAuthScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.GetTodo(ctx, todoId)
@@ -95,8 +111,6 @@ func (w *ServerInterfaceWrapper) UpdateTodo(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter todo_id: %s", err))
 	}
 
-	ctx.Set(BasicAuthScopes, []string{})
-
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.UpdateTodo(ctx, todoId)
 	return err
@@ -105,8 +119,6 @@ func (w *ServerInterfaceWrapper) UpdateTodo(ctx echo.Context) error {
 // GetUserList converts echo context to params.
 func (w *ServerInterfaceWrapper) GetUserList(ctx echo.Context) error {
 	var err error
-
-	ctx.Set(BasicAuthScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.GetUserList(ctx)
@@ -117,10 +129,24 @@ func (w *ServerInterfaceWrapper) GetUserList(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) CreateUser(ctx echo.Context) error {
 	var err error
 
-	ctx.Set(BasicAuthScopes, []string{})
-
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.CreateUser(ctx)
+	return err
+}
+
+// DeleteUser converts echo context to params.
+func (w *ServerInterfaceWrapper) DeleteUser(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "user_id" -------------
+	var userId UserId
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "user_id", runtime.ParamLocationPath, ctx.Param("user_id"), &userId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter user_id: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.DeleteUser(ctx, userId)
 	return err
 }
 
@@ -134,8 +160,6 @@ func (w *ServerInterfaceWrapper) GetUser(ctx echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter user_id: %s", err))
 	}
-
-	ctx.Set(BasicAuthScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.GetUser(ctx, userId)
@@ -152,8 +176,6 @@ func (w *ServerInterfaceWrapper) UpdateUser(ctx echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter user_id: %s", err))
 	}
-
-	ctx.Set(BasicAuthScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.UpdateUser(ctx, userId)
@@ -190,10 +212,12 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 
 	router.GET(baseURL+"/todos", wrapper.GetTodoList)
 	router.POST(baseURL+"/todos", wrapper.CreateTodo)
+	router.DELETE(baseURL+"/todos/:todo_id", wrapper.DeleteTodo)
 	router.GET(baseURL+"/todos/:todo_id", wrapper.GetTodo)
 	router.PUT(baseURL+"/todos/:todo_id", wrapper.UpdateTodo)
 	router.GET(baseURL+"/users", wrapper.GetUserList)
 	router.POST(baseURL+"/users", wrapper.CreateUser)
+	router.DELETE(baseURL+"/users/:user_id", wrapper.DeleteUser)
 	router.GET(baseURL+"/users/:user_id", wrapper.GetUser)
 	router.PUT(baseURL+"/users/:user_id", wrapper.UpdateUser)
 

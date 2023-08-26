@@ -67,12 +67,12 @@ createUserRequestNameL f CreateUserRequest{..} = (\createUserRequestName -> Crea
 -- * Todo
 
 -- | 'todoId' Lens
-todoIdL :: Lens_' Todo (Maybe Int)
+todoIdL :: Lens_' Todo (Int)
 todoIdL f Todo{..} = (\todoId -> Todo { todoId, ..} ) <$> f todoId
 {-# INLINE todoIdL #-}
 
 -- | 'todoTitle' Lens
-todoTitleL :: Lens_' Todo (Maybe Text)
+todoTitleL :: Lens_' Todo (Text)
 todoTitleL f Todo{..} = (\todoTitle -> Todo { todoTitle, ..} ) <$> f todoTitle
 {-# INLINE todoTitleL #-}
 
@@ -92,12 +92,12 @@ todoCreatedByL f Todo{..} = (\todoCreatedBy -> Todo { todoCreatedBy, ..} ) <$> f
 {-# INLINE todoCreatedByL #-}
 
 -- | 'todoCreatedAt' Lens
-todoCreatedAtL :: Lens_' Todo (Maybe DateTime)
+todoCreatedAtL :: Lens_' Todo (DateTime)
 todoCreatedAtL f Todo{..} = (\todoCreatedAt -> Todo { todoCreatedAt, ..} ) <$> f todoCreatedAt
 {-# INLINE todoCreatedAtL #-}
 
 -- | 'todoUpdatedAt' Lens
-todoUpdatedAtL :: Lens_' Todo (Maybe DateTime)
+todoUpdatedAtL :: Lens_' Todo (DateTime)
 todoUpdatedAtL f Todo{..} = (\todoUpdatedAt -> Todo { todoUpdatedAt, ..} ) <$> f todoUpdatedAt
 {-# INLINE todoUpdatedAtL #-}
 
@@ -106,27 +106,32 @@ todoUpdatedAtL f Todo{..} = (\todoUpdatedAt -> Todo { todoUpdatedAt, ..} ) <$> f
 -- * User
 
 -- | 'userId' Lens
-userIdL :: Lens_' User (Maybe Int)
+userIdL :: Lens_' User (Int)
 userIdL f User{..} = (\userId -> User { userId, ..} ) <$> f userId
 {-# INLINE userIdL #-}
 
 -- | 'userName' Lens
-userNameL :: Lens_' User (Maybe Text)
+userNameL :: Lens_' User (Text)
 userNameL f User{..} = (\userName -> User { userName, ..} ) <$> f userName
 {-# INLINE userNameL #-}
 
+-- | 'userRole' Lens
+userRoleL :: Lens_' User (Maybe E'Role)
+userRoleL f User{..} = (\userRole -> User { userRole, ..} ) <$> f userRole
+{-# INLINE userRoleL #-}
+
 -- | 'userTodos' Lens
-userTodosL :: Lens_' User (Maybe Todo)
+userTodosL :: Lens_' User (Todo)
 userTodosL f User{..} = (\userTodos -> User { userTodos, ..} ) <$> f userTodos
 {-# INLINE userTodosL #-}
 
 -- | 'userCreatedAt' Lens
-userCreatedAtL :: Lens_' User (Maybe DateTime)
+userCreatedAtL :: Lens_' User (DateTime)
 userCreatedAtL f User{..} = (\userCreatedAt -> User { userCreatedAt, ..} ) <$> f userCreatedAt
 {-# INLINE userCreatedAtL #-}
 
 -- | 'userUpdatedAt' Lens
-userUpdatedAtL :: Lens_' User (Maybe DateTime)
+userUpdatedAtL :: Lens_' User (DateTime)
 userUpdatedAtL f User{..} = (\userUpdatedAt -> User { userUpdatedAt, ..} ) <$> f userUpdatedAt
 {-# INLINE userUpdatedAtL #-}
 

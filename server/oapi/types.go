@@ -9,29 +9,35 @@ import (
 	openapi_types "github.com/deepmap/oapi-codegen/pkg/types"
 )
 
+// Defines values for UserRole.
 const (
-	BasicAuthScopes = "basicAuth.Scopes"
+	Editor UserRole = "editor"
+	Viewer UserRole = "viewer"
 )
 
 // Todo defines model for Todo.
 type Todo struct {
-	CreatedAt   *time.Time          `json:"created_at,omitempty"`
+	CreatedAt   time.Time           `json:"created_at"`
 	CreatedBy   *int                `json:"created_by,omitempty"`
 	Description *string             `json:"description,omitempty"`
 	DueDate     *openapi_types.Date `json:"due_date,omitempty"`
-	Id          *int                `json:"id,omitempty"`
-	Title       *string             `json:"title,omitempty"`
-	UpdatedAt   *time.Time          `json:"updated_at,omitempty"`
+	Id          int                 `json:"id"`
+	Title       string              `json:"title"`
+	UpdatedAt   time.Time           `json:"updated_at"`
 }
 
 // User defines model for User.
 type User struct {
-	CreatedAt *time.Time `json:"created_at,omitempty"`
-	Id        *int       `json:"id,omitempty"`
-	Name      *string    `json:"name,omitempty"`
-	Todos     *Todo      `json:"todos,omitempty"`
-	UpdatedAt *time.Time `json:"updated_at,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
+	Id        int       `json:"id"`
+	Name      string    `json:"name"`
+	Role      *UserRole `json:"role,omitempty"`
+	Todos     Todo      `json:"todos"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
+
+// UserRole defines model for User.Role.
+type UserRole string
 
 // TodoId defines model for todo_id.
 type TodoId = int

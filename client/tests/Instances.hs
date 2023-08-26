@@ -137,13 +137,13 @@ instance Arbitrary Todo where
 genTodo :: Int -> Gen Todo
 genTodo n =
   Todo
-    <$> arbitraryReducedMaybe n -- todoId :: Maybe Int
-    <*> arbitraryReducedMaybe n -- todoTitle :: Maybe Text
+    <$> arbitrary -- todoId :: Int
+    <*> arbitrary -- todoTitle :: Text
     <*> arbitraryReducedMaybe n -- todoDescription :: Maybe Text
     <*> arbitraryReducedMaybe n -- todoDueDate :: Maybe Date
     <*> arbitraryReducedMaybe n -- todoCreatedBy :: Maybe Int
-    <*> arbitraryReducedMaybe n -- todoCreatedAt :: Maybe DateTime
-    <*> arbitraryReducedMaybe n -- todoUpdatedAt :: Maybe DateTime
+    <*> arbitraryReduced n -- todoCreatedAt :: DateTime
+    <*> arbitraryReduced n -- todoUpdatedAt :: DateTime
   
 instance Arbitrary User where
   arbitrary = sized genUser
@@ -151,12 +151,16 @@ instance Arbitrary User where
 genUser :: Int -> Gen User
 genUser n =
   User
-    <$> arbitraryReducedMaybe n -- userId :: Maybe Int
-    <*> arbitraryReducedMaybe n -- userName :: Maybe Text
-    <*> arbitraryReducedMaybe n -- userTodos :: Maybe Todo
-    <*> arbitraryReducedMaybe n -- userCreatedAt :: Maybe DateTime
-    <*> arbitraryReducedMaybe n -- userUpdatedAt :: Maybe DateTime
+    <$> arbitrary -- userId :: Int
+    <*> arbitrary -- userName :: Text
+    <*> arbitraryReducedMaybe n -- userRole :: Maybe E'Role
+    <*> arbitraryReduced n -- userTodos :: Todo
+    <*> arbitraryReduced n -- userCreatedAt :: DateTime
+    <*> arbitraryReduced n -- userUpdatedAt :: DateTime
   
 
 
+
+instance Arbitrary E'Role where
+  arbitrary = arbitraryBoundedEnum
 

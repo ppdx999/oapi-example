@@ -144,26 +144,26 @@ mkCreateUserRequest createUserRequestName =
 -- ** Todo
 -- | Todo
 data Todo = Todo
-  { todoId :: !(Maybe Int) -- ^ "id"
-  , todoTitle :: !(Maybe Text) -- ^ "title"
+  { todoId :: !(Int) -- ^ /Required/ "id"
+  , todoTitle :: !(Text) -- ^ /Required/ "title"
   , todoDescription :: !(Maybe Text) -- ^ "description"
   , todoDueDate :: !(Maybe Date) -- ^ "due_date"
   , todoCreatedBy :: !(Maybe Int) -- ^ "created_by"
-  , todoCreatedAt :: !(Maybe DateTime) -- ^ "created_at"
-  , todoUpdatedAt :: !(Maybe DateTime) -- ^ "updated_at"
+  , todoCreatedAt :: !(DateTime) -- ^ /Required/ "created_at"
+  , todoUpdatedAt :: !(DateTime) -- ^ /Required/ "updated_at"
   } deriving (P.Show, P.Eq, P.Typeable)
 
 -- | FromJSON Todo
 instance A.FromJSON Todo where
   parseJSON = A.withObject "Todo" $ \o ->
     Todo
-      <$> (o .:? "id")
-      <*> (o .:? "title")
+      <$> (o .:  "id")
+      <*> (o .:  "title")
       <*> (o .:? "description")
       <*> (o .:? "due_date")
       <*> (o .:? "created_by")
-      <*> (o .:? "created_at")
-      <*> (o .:? "updated_at")
+      <*> (o .:  "created_at")
+      <*> (o .:  "updated_at")
 
 -- | ToJSON Todo
 instance A.ToJSON Todo where
@@ -181,37 +181,43 @@ instance A.ToJSON Todo where
 
 -- | Construct a value of type 'Todo' (by applying it's required fields, if any)
 mkTodo
-  :: Todo
-mkTodo =
+  :: Int -- ^ 'todoId' 
+  -> Text -- ^ 'todoTitle' 
+  -> DateTime -- ^ 'todoCreatedAt' 
+  -> DateTime -- ^ 'todoUpdatedAt' 
+  -> Todo
+mkTodo todoId todoTitle todoCreatedAt todoUpdatedAt =
   Todo
-  { todoId = Nothing
-  , todoTitle = Nothing
+  { todoId
+  , todoTitle
   , todoDescription = Nothing
   , todoDueDate = Nothing
   , todoCreatedBy = Nothing
-  , todoCreatedAt = Nothing
-  , todoUpdatedAt = Nothing
+  , todoCreatedAt
+  , todoUpdatedAt
   }
 
 -- ** User
 -- | User
 data User = User
-  { userId :: !(Maybe Int) -- ^ "id"
-  , userName :: !(Maybe Text) -- ^ "name"
-  , userTodos :: !(Maybe Todo) -- ^ "todos"
-  , userCreatedAt :: !(Maybe DateTime) -- ^ "created_at"
-  , userUpdatedAt :: !(Maybe DateTime) -- ^ "updated_at"
+  { userId :: !(Int) -- ^ /Required/ "id"
+  , userName :: !(Text) -- ^ /Required/ "name"
+  , userRole :: !(Maybe E'Role) -- ^ "role"
+  , userTodos :: !(Todo) -- ^ /Required/ "todos"
+  , userCreatedAt :: !(DateTime) -- ^ /Required/ "created_at"
+  , userUpdatedAt :: !(DateTime) -- ^ /Required/ "updated_at"
   } deriving (P.Show, P.Eq, P.Typeable)
 
 -- | FromJSON User
 instance A.FromJSON User where
   parseJSON = A.withObject "User" $ \o ->
     User
-      <$> (o .:? "id")
-      <*> (o .:? "name")
-      <*> (o .:? "todos")
-      <*> (o .:? "created_at")
-      <*> (o .:? "updated_at")
+      <$> (o .:  "id")
+      <*> (o .:  "name")
+      <*> (o .:? "role")
+      <*> (o .:  "todos")
+      <*> (o .:  "created_at")
+      <*> (o .:  "updated_at")
 
 -- | ToJSON User
 instance A.ToJSON User where
@@ -219,6 +225,7 @@ instance A.ToJSON User where
    _omitNulls
       [ "id" .= userId
       , "name" .= userName
+      , "role" .= userRole
       , "todos" .= userTodos
       , "created_at" .= userCreatedAt
       , "updated_at" .= userUpdatedAt
@@ -227,33 +234,52 @@ instance A.ToJSON User where
 
 -- | Construct a value of type 'User' (by applying it's required fields, if any)
 mkUser
-  :: User
-mkUser =
+  :: Int -- ^ 'userId' 
+  -> Text -- ^ 'userName' 
+  -> Todo -- ^ 'userTodos' 
+  -> DateTime -- ^ 'userCreatedAt' 
+  -> DateTime -- ^ 'userUpdatedAt' 
+  -> User
+mkUser userId userName userTodos userCreatedAt userUpdatedAt =
   User
-  { userId = Nothing
-  , userName = Nothing
-  , userTodos = Nothing
-  , userCreatedAt = Nothing
-  , userUpdatedAt = Nothing
+  { userId
+  , userName
+  , userRole = Nothing
+  , userTodos
+  , userCreatedAt
+  , userUpdatedAt
   }
 
 
+-- * Enums
 
 
--- * Auth Methods
+-- ** E'Role
 
--- ** AuthBasicBasicAuth
-data AuthBasicBasicAuth =
-  AuthBasicBasicAuth B.ByteString B.ByteString -- ^ username password
-  deriving (P.Eq, P.Show, P.Typeable)
+-- | Enum of 'Text'
+data E'Role
+  = E'Role'Viewer -- ^ @"viewer"@
+  | E'Role'Editor -- ^ @"editor"@
+  deriving (P.Show, P.Eq, P.Typeable, P.Ord, P.Bounded, P.Enum)
 
-instance AuthMethod AuthBasicBasicAuth where
-  applyAuthMethod _ a@(AuthBasicBasicAuth user pw) req =
-    P.pure $
-    if (P.typeOf a `P.elem` rAuthTypes req)
-      then req `setHeader` toHeader ("Authorization", T.decodeUtf8 cred)
-           & L.over rAuthTypesL (P.filter (/= P.typeOf a))
-      else req
-    where cred = BC.append "Basic " (B64.encode $ BC.concat [ user, ":", pw ])
+instance A.ToJSON E'Role where toJSON = A.toJSON . fromE'Role
+instance A.FromJSON E'Role where parseJSON o = P.either P.fail (pure . P.id) . toE'Role =<< A.parseJSON o
+instance WH.ToHttpApiData E'Role where toQueryParam = WH.toQueryParam . fromE'Role
+instance WH.FromHttpApiData E'Role where parseQueryParam o = WH.parseQueryParam o >>= P.left T.pack . toE'Role
+instance MimeRender MimeMultipartFormData E'Role where mimeRender _ = mimeRenderDefaultMultipartFormData
+
+-- | unwrap 'E'Role' enum
+fromE'Role :: E'Role -> Text
+fromE'Role = \case
+  E'Role'Viewer -> "viewer"
+  E'Role'Editor -> "editor"
+
+-- | parse 'E'Role' enum
+toE'Role :: Text -> P.Either String E'Role
+toE'Role = \case
+  "viewer" -> P.Right E'Role'Viewer
+  "editor" -> P.Right E'Role'Editor
+  s -> P.Left $ "toE'Role: enum parse failure: " P.++ P.show s
+
 
 

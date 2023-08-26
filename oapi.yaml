@@ -12,8 +12,8 @@ servers:
       origin:
         default: http://localhost:9995
         description: Server Origin
-security:
-  - basicAuth: []
+security: []
+#   - basicAuth: []
 paths:
   /todos:
     get:
@@ -112,7 +112,18 @@ paths:
                   $ref: '#/components/schemas/Todo'
         '400':
           description: failed
-
+    delete:
+      tags:
+        - Todo
+      summary: Delete Todo
+      operationId: deleteTodo
+      parameters:
+        - $ref: '#/components/parameters/todo_id'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: failed
   /users:
     get:
       tags:
@@ -171,7 +182,6 @@ paths:
                 $ref: '#/components/schemas/User'
         '400':
           description: failed
-
     put:
       tags:
         - User
@@ -200,11 +210,23 @@ paths:
                   $ref: '#/components/schemas/User'
         '400':
           description: failed
+    delete:
+      tags:
+        - User
+      summary: Delete User
+      operationId: deleteUser
+      parameters:
+        - $ref: '#/components/parameters/user_id'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: failed
 components:
-  securitySchemes:
-    basicAuth:
-      type: http
-      scheme: basic
+  # securitySchemes:
+  #   basicAuth:
+  #     type: http
+  #     scheme: basic
   parameters:
     todo_id:
       name: todo_id
@@ -221,6 +243,11 @@ components:
   schemas:
     Todo:
       type: object
+      required:
+        - id
+        - title
+        - created_at
+        - updated_at
       properties:
         id:
           type: integer
@@ -241,11 +268,22 @@ components:
           format: date-time
     User:
       type: object
+      required:
+        - id
+        - name
+        - created_at
+        - updated_at
+        - todos
       properties:
         id:
           type: integer
         name:
           type: string
+        role:
+          type: string
+          enum:
+            - viewer
+            - editor
         todos:
           $ref: '#/components/schemas/Todo'
         created_at:

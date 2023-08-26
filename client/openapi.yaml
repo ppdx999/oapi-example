@@ -12,8 +12,6 @@ servers:
     origin:
       default: http://localhost:9995
       description: Server Origin
-security:
-- basicAuth: []
 paths:
   /todos:
     get:
@@ -52,6 +50,24 @@ paths:
       tags:
       - Todo
   /todos/{todo_id}:
+    delete:
+      operationId: deleteTodo
+      parameters:
+      - explode: false
+        in: path
+        name: todo_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: failed
+      summary: Delete Todo
+      tags:
+      - Todo
     get:
       operationId: getTodo
       parameters:
@@ -140,6 +156,24 @@ paths:
       tags:
       - User
   /users/{user_id}:
+    delete:
+      operationId: deleteUser
+      parameters:
+      - explode: false
+        in: path
+        name: user_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: failed
+      summary: Delete User
+      tags:
+      - User
     get:
       operationId: getUser
       parameters:
@@ -237,9 +271,15 @@ components:
         updated_at:
           format: date-time
           type: string
+      required:
+      - created_at
+      - id
+      - title
+      - updated_at
       type: object
     User:
       example:
+        role: viewer
         updated_at: 2000-01-23T04:56:07.000+00:00
         name: name
         created_at: 2000-01-23T04:56:07.000+00:00
@@ -257,6 +297,11 @@ components:
           type: integer
         name:
           type: string
+        role:
+          enum:
+          - viewer
+          - editor
+          type: string
         todos:
           $ref: '#/components/schemas/Todo'
         created_at:
@@ -265,6 +310,12 @@ components:
         updated_at:
           format: date-time
           type: string
+      required:
+      - created_at
+      - id
+      - name
+      - todos
+      - updated_at
       type: object
     createTodo_request:
       properties:
@@ -285,7 +336,3 @@ components:
       required:
       - name
       type: object
-  securitySchemes:
-    basicAuth:
-      scheme: basic
-      type: http

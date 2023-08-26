@@ -63,14 +63,11 @@ import qualified Prelude as P
 -- 
 -- Create User
 -- 
--- AuthMethod: 'AuthBasicBasicAuth'
--- 
 createUser
   :: (Consumes CreateUser MimeJSON)
   => TodoRequest CreateUser MimeJSON User MimeJSON
 createUser =
   _mkRequest "POST" ["/users"]
-    `_hasAuthType` (P.Proxy :: P.Proxy AuthBasicBasicAuth)
 
 data CreateUser 
 instance HasBodyParam CreateUser CreateUserRequest 
@@ -82,20 +79,33 @@ instance Consumes CreateUser MimeJSON
 instance Produces CreateUser MimeJSON
 
 
+-- *** deleteUser
+
+-- | @DELETE \/users\/{user_id}@
+-- 
+-- Delete User
+-- 
+deleteUser
+  :: UserId -- ^ "userId"
+  -> TodoRequest DeleteUser MimeNoContent NoContent MimeNoContent
+deleteUser (UserId userId) =
+  _mkRequest "DELETE" ["/users/",toPath userId]
+
+data DeleteUser  
+instance Produces DeleteUser MimeNoContent
+
+
 -- *** getUser
 
 -- | @GET \/users\/{user_id}@
 -- 
 -- Get User
 -- 
--- AuthMethod: 'AuthBasicBasicAuth'
--- 
 getUser
   :: UserId -- ^ "userId"
   -> TodoRequest GetUser MimeNoContent User MimeJSON
 getUser (UserId userId) =
   _mkRequest "GET" ["/users/",toPath userId]
-    `_hasAuthType` (P.Proxy :: P.Proxy AuthBasicBasicAuth)
 
 data GetUser  
 -- | @application/json@
@@ -108,13 +118,10 @@ instance Produces GetUser MimeJSON
 -- 
 -- Get User List
 -- 
--- AuthMethod: 'AuthBasicBasicAuth'
--- 
 getUserList
   :: TodoRequest GetUserList MimeNoContent [User] MimeJSON
 getUserList =
   _mkRequest "GET" ["/users"]
-    `_hasAuthType` (P.Proxy :: P.Proxy AuthBasicBasicAuth)
 
 data GetUserList  
 -- | @application/json@
@@ -127,15 +134,12 @@ instance Produces GetUserList MimeJSON
 -- 
 -- Update User
 -- 
--- AuthMethod: 'AuthBasicBasicAuth'
--- 
 updateUser
   :: (Consumes UpdateUser MimeJSON)
   => UserId -- ^ "userId"
   -> TodoRequest UpdateUser MimeJSON [User] MimeJSON
 updateUser (UserId userId) =
   _mkRequest "PUT" ["/users/",toPath userId]
-    `_hasAuthType` (P.Proxy :: P.Proxy AuthBasicBasicAuth)
 
 data UpdateUser 
 instance HasBodyParam UpdateUser CreateUserRequest 

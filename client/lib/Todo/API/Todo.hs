@@ -63,14 +63,11 @@ import qualified Prelude as P
 -- 
 -- Craete Todo
 -- 
--- AuthMethod: 'AuthBasicBasicAuth'
--- 
 createTodo
   :: (Consumes CreateTodo MimeJSON)
   => TodoRequest CreateTodo MimeJSON Todo MimeJSON
 createTodo =
   _mkRequest "POST" ["/todos"]
-    `_hasAuthType` (P.Proxy :: P.Proxy AuthBasicBasicAuth)
 
 data CreateTodo 
 instance HasBodyParam CreateTodo CreateTodoRequest 
@@ -82,20 +79,33 @@ instance Consumes CreateTodo MimeJSON
 instance Produces CreateTodo MimeJSON
 
 
+-- *** deleteTodo
+
+-- | @DELETE \/todos\/{todo_id}@
+-- 
+-- Delete Todo
+-- 
+deleteTodo
+  :: TodoId -- ^ "todoId"
+  -> TodoRequest DeleteTodo MimeNoContent NoContent MimeNoContent
+deleteTodo (TodoId todoId) =
+  _mkRequest "DELETE" ["/todos/",toPath todoId]
+
+data DeleteTodo  
+instance Produces DeleteTodo MimeNoContent
+
+
 -- *** getTodo
 
 -- | @GET \/todos\/{todo_id}@
 -- 
 -- Get Todo
 -- 
--- AuthMethod: 'AuthBasicBasicAuth'
--- 
 getTodo
   :: TodoId -- ^ "todoId"
   -> TodoRequest GetTodo MimeNoContent Todo MimeJSON
 getTodo (TodoId todoId) =
   _mkRequest "GET" ["/todos/",toPath todoId]
-    `_hasAuthType` (P.Proxy :: P.Proxy AuthBasicBasicAuth)
 
 data GetTodo  
 -- | @application/json@
@@ -108,13 +118,10 @@ instance Produces GetTodo MimeJSON
 -- 
 -- Get Todo List
 -- 
--- AuthMethod: 'AuthBasicBasicAuth'
--- 
 getTodoList
   :: TodoRequest GetTodoList MimeNoContent [Todo] MimeJSON
 getTodoList =
   _mkRequest "GET" ["/todos"]
-    `_hasAuthType` (P.Proxy :: P.Proxy AuthBasicBasicAuth)
 
 data GetTodoList  
 -- | @application/json@
@@ -127,15 +134,12 @@ instance Produces GetTodoList MimeJSON
 -- 
 -- Update Todo
 -- 
--- AuthMethod: 'AuthBasicBasicAuth'
--- 
 updateTodo
   :: (Consumes UpdateTodo MimeJSON)
   => TodoId -- ^ "todoId"
   -> TodoRequest UpdateTodo MimeJSON [Todo] MimeJSON
 updateTodo (TodoId todoId) =
   _mkRequest "PUT" ["/todos/",toPath todoId]
-    `_hasAuthType` (P.Proxy :: P.Proxy AuthBasicBasicAuth)
 
 data UpdateTodo 
 instance HasBodyParam UpdateTodo CreateTodoRequest 

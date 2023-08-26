@@ -4,4 +4,9 @@ tasks:
   gen:
     cmds:
       - openapi-generator-cli generate -i oapi.yaml -g haskell-http-client -o client
-      - oapi-codegen -generate "server" -package oapi ./oapi.yaml > ./server/oapi/oapi.go
+      - oapi-codegen -generate "server" -package oapi ./oapi.yaml > ./server/oapi/server.go
+      - oapi-codegen -generate "types" -package oapi ./oapi.yaml > ./server/oapi/types.go
+
+  ok:
+    cmds:
+      - redocly lint oapi.yaml
